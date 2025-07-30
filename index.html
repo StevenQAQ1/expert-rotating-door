@@ -406,8 +406,51 @@
     </div>
 
     <script>
-        // 模拟文档模板内容
-        const templates = {
+        // 下载模板函数
+        function downloadTemplate(templateName) {
+            const templates = getTemplates();
+            if (templates[templateName]) {
+                const blob = new Blob([templates[templateName]], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = templateName.replace('.docx', '.txt'); // 改为txt格式方便查看
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } else {
+                alert('模板文件未找到');
+            }
+        }
+
+        // 保存反馈函数
+        function saveFeedback() {
+            const feedback = document.getElementById('optimizationFeedback').value;
+            if (feedback.trim() === '') {
+                alert('请先填写反馈内容');
+                return;
+            }
+            
+            // 创建反馈文件并下载
+            const blob = new Blob([`AI队友优化反馈\n\n时间：${new Date().toLocaleString()}\n\n内容：\n${feedback}`], 
+                { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'AI队友优化反馈.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('反馈已保存并下载');
+            document.getElementById('optimizationFeedback').value = '';
+        }
+
+        // 获取模板内容
+        function getTemplates() {
+            return {
             '业务协同决策分析模板.docx': `业务协同决策分析：
 
 <请填写报告名称>
@@ -616,7 +659,7 @@ Checklist
 
 - 填写内容：`,
 
-            'AI队友需求识别模板.docx': `AI队友需求识别模板
+                'AI队友需求识别模板.docx': `AI队友需求识别模板
 
 请根据业务协同决策分析的结果，识别AI队友的具体需求。
 
@@ -658,7 +701,7 @@ Checklist
 
 填写内容：`,
 
-            'AI队友详细设计模板.docx': `AI队友详细设计模板
+                'AI队友详细设计模板.docx': `AI队友详细设计模板
 
 基于需求分析结果，进行AI队友的详细设计。
 
@@ -669,4 +712,57 @@ Checklist
 - 核心组件说明：
 - 技术选型说明：
 
-### 1
+### 1.2 数据流设计
+- 数据输入流程：
+- 数据处理流程：
+- 数据输出流程：
+
+### 1.3 算法设计
+- 核心算法选择：
+- 算法实现逻辑：
+- 算法优化策略：
+
+## 2. 模块详细设计
+
+### 2.1 数据处理模块
+- 模块功能描述：
+- 接口设计：
+- 实现细节：
+
+### 2.2 决策支持模块
+- 模块功能描述：
+- 接口设计：
+- 实现细节：
+
+### 2.3 用户交互模块
+- 模块功能描述：
+- 接口设计：
+- 实现细节：
+
+## 3. 数据库设计
+
+### 3.1 数据表设计
+- 主要数据表：
+- 表结构说明：
+- 关系设计：
+
+### 3.2 数据字典
+- 关键字段定义：
+- 数据类型说明：
+- 约束条件：
+
+## 4. 接口设计
+
+### 4.1 内部接口
+- 模块间接口：
+- 接口协议：
+- 数据格式：
+
+### 4.2 外部接口
+- 系统集成接口：
+- 第三方服务接口：
+- API文档：
+
+填写内容：`
+            };
+        }
