@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专家旋转门</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .modules-container {
+            display: grid;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .module {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .module-header {
+            padding: 25px;
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+        }
+
+        .module-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .module-header .role {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: normal;
+        }
+
+        .module-content {
+            padding: 30px;
+        }
+
+        .function-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .function-item:hover {
+            border-color: #4a90e2;
+            background-color: #f8fbff;
+        }
+
+        .function-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .function-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .function-title::before {
+            content: "●";
+            color: #4a90e2;
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .function-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .download-btn, .link-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .link-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .link-btn:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .hint {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            color: #856404;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .hint strong {
+            color: #d68910;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step-number {
+            background: #4a90e2;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .textarea-container {
+            margin-top: 15px;
+        }
+
+        .textarea-container textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .textarea-container textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .module1 .module-header {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .module2 .module-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .module3 .module-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .module-content {
+                padding: 20px;
+            }
+            
+            .function-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .steps {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>专家旋转门</h1>
+            <p>业务协同决策分析与AI队友开发平台</p>
+        </div>
+
+        <div class="modules-container">
+            <!-- 模块1：业务人员——经验知识提取 -->
+            <div class="module module1">
+                <div class="module-header">
+                    <h2>模块1：业务人员</h2>
+                    <div class="role">经验知识提取</div>
+                </div>
+                <div class="module-content">
+                    <div class="function-item">
+                        <div class="function-title">业务协同决策分析</div>
+                        <div class="function-content">
+                            <button class="download-btn" onclick="downloadTemplate('业务协同决策分析模板.docx')">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"/>
+                                </svg>
+                                下载模板
+                            </button>
+                        </div>
+                        <div class="hint">
+                            您现在的角色是<strong>业务人员</strong>，请根据<strong>"业务协同决策分析模板.docx"中的任务指南填写相应内容。</strong>
+                        </div>
+                    </div>
+
+                    <div class="function-item">
+                        <div class="function-title">AI队友需求识别</div>
+                        <div class="function-content">
+                            <button class="download-btn" onclick="downloadTemplate('AI队友需求识别模板.docx')">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"/>
+                                </svg>
+                                下载模板
+                            </button>
+                        </div>
+                        <div class="hint">
+                            您现在的角色是<strong>业务人员</strong>，请根据<strong>"AI队友需求识别模板.docx"中的任务指南填写相应内容。</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模块2：IT人员——AI队友开发 -->
+            <div class="module module2">
+                <div class="module-header">
+                    <h2>模块2：IT人员</h2>
+                    <div class="role">AI队友开发</div>
+                </div>
+                <div class="module-content">
+                    <div class="function-item">
+                        <div class="function-title">AI队友详细设计</div>
+                        <div class="function-content">
+                            <button class="download-btn" onclick="downloadTemplate('AI队友详细设计模板.docx')">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"/>
+                                </svg>
+                                下载模板
+                            </button>
+                        </div>
+                        <div class="hint">
+                            您现在的角色是<strong>IT人员</strong>，请根据<strong>"AI队友详细设计模板.docx"中的任务指南填写相应内容。</strong>
+                        </div>
+                    </div>
+
+                    <div class="function-item">
+                        <div class="function-title">AI队友实现</div>
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <a href="https://claude.ai/" target="_blank" class="link-btn">
+                                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-2a1 1 0 10-2 0v2H5V7h2a1 1 0 000-2H5z"/>
+                                    </svg>
+                                    前往Claude生成AI队友
+                                </a>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <a href="http://localhost:5678" target="_blank" class="link-btn">
+                                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-2a1 1 0 10-2 0v2H5V7h2a1 1 0 000-2H5z"/>
+                                    </svg>
+                                    前往n8n调试已生成的AI队友
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模块3：AI运营官——AI队友验证与优化 -->
+            <div class="module module3">
+                <div class="module-header">
+                    <h2>模块3：AI运营官</h2>
+                    <div class="role">AI队友验证与优化</div>
+                </div>
+                <div class="module-content">
+                    <div class="hint" style="margin-bottom: 25px;">
+                        您现在的角色是<strong>AI运营官</strong>，请确保您已完成AI队友开发。
+                    </div>
+
+                    <div class="function-item">
+                        <div class="function-title">AI队友验证：虚仿实验</div>
+                        <div class="function-content">
+                            <a href="https://www.ilab-x.com/details/page?id=11770&isView=true" target="_blank" class="link-btn">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                                    <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002-2v-2a1 1 0 10-2 0v2H5V7h2a1 1 0 000-2H5z"/>
+                                </svg>
+                                访问虚仿实验平台
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="function-item">
+                        <div class="function-title">AI队友优化</div>
+                        <div class="hint" style="margin-bottom: 15px;">
+                            请在此处填写AI队友的使用效果，以持续优化AI队友的设计：
+                        </div>
+                        <div class="textarea-container">
+                            <textarea id="optimizationFeedback" placeholder="请详细描述AI队友的使用效果、遇到的问题以及改进建议..."></textarea>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button class="download-btn" onclick="saveFeedback()">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/>
+                                </svg>
+                                保存反馈
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟文档模板内容
+        const templates = {
+            '业务协同决策分析模板.docx': `业务协同决策分析：
+
+<请填写报告名称>
+
+目录
+
+第1章 协同场景识别 
+1.1情境 
+1.2场景目标 
+1.3参与者 
+1.4决策行为 
+
+第2章 协同决策事件分析
+2.1协同决策事件描述 
+2.2决策知识及数据梳理 
+
+# 第1章 协同场景识别
+
+欢迎来到"业务协同决策分析"的引导指南，您的核心目标是详细地梳理您的业务流程，识别其中的协同决策并分析。
+
+本阶段的任务是从业务决策的复盘信息（可在界面右侧"阅读"一栏上传复盘文件）中捕获和识别具体的协同场景，并对协同场景的各个组成要素作出精确的描述。
+
+## 1.1情境
+
+- 任务指南：
+
+情境是指协同场景涉及的环境及其相关组件与特征
+
+情境既包括现实世界中的物理环境，如协同发生的时间、地点等，也包括虑拟环境，如参与协同活动的组织，协同数字化平台或系统，业务状态等。
+
+- 示例：
+
+从协同场景识别可以得出以下三类情境:
+
+(1)爆仓情况下(产品过多)，需要现金支撑(采购成本紧缺)
+
+(2)常规业务中的接单业务活动
+
+(3)该协同场景主要应对常规业务中的接单业务活动
+
+- 填写内容：
+
+## 1.2场景目标
+
+- 任务指南：
+
+场景目标是指协同发生的原因和需要达到的效果。在该总目标下，不同参与者可能存在不同的目标。
+
+本部分需要更明确的量化标准，在实例的基础上抽取出共性的业务目标。
+
+- 示例：
+
+协同目标是选取"满足各方诉求"的订单:
+
+1.订单利润较高
+
+2.需求数量在生产能力范围内
+
+- 填写内容：
+
+## 1.3参与者
+
+- 任务指南：
+
+进行该协同业务时，需要组织内不同的业务人员参与，这些人员与该场景密切相关，需要为协同目标达成提供支持，包括贡献知识或提供数据支持。
+
+需要反复复盘业务协同过程中的所有参与者，本部分需要做出简短的定义。如协同决策复盘中涉及参与者有"张三"，"李四"，其身份分别为销售部门业务人员或经理和生产部门业务人员或经理，因此，在这一部分需说明参与者为"销售经理"与"生产经理"。
+
+- 示例：
+
+协同目标是选取"满足各方诉求"的订单:
+
+市场经理
+
+生产经理
+
+仓库经理
+
+财务经理
+
+- 填写内容：
+
+## 1.4决策行为
+
+- 任务指南：
+
+在协同场景中，不同参与者进行决策行为来支持参与者子目标的达成。本节旨在分析协同场景中，不同参与者完成的决策。
+
+同时，要考虑是否存在协同决策。在协同场景中，某活动的执行需要各参与者积极参与，达成共识。本节旨在确定协同场景中的这种达成共识活动。
+
+任务指南
+
+本节需要详细分析所有的决策事件和决策顺序，通过日常业务活动补充必要的决策事件。从各参与者视角出发分析。
+
+同时考虑，是否存在协同活动，需要详细分析达成共识的过程。并以简短的业务术语描述协同活动。考虑以下几个方面:
+
+(1)某一决策行为需要至少两人参与
+
+(2)在开展协同决策时，不同参与者具有各自决策行为
+
+- 示例：
+
+决策行为：
+
+a)市场经理:订单初步选取、订单谈判、订单接取
+
+b)生产经理:根据交货期分析订单、判断需求数量是否满足生产能力、选择订单
+
+c)仓库经理:判断需求数量是否合理、是否需要调整仓库容量
+
+d)财务经理:生产成本预测、采购成本预测、利润及毛利率计算、订单对现金流影响分析
+
+协同活动：
+
+确定谈判方向
+
+- 填写内容：
+
+#  第2章 协同决策事件分析
+
+本阶段的任务是在识别出协同场景的基础上，从不同参与者的视角下抽取具体的协同决策事件，要求详细地描述协同决策事件，以及决策所需的知识、规则和数据来源。
+
+## 2.1协同决策事件描述
+
+- 任务指南：
+
+本节旨在全面分析协同场景中涉及的决策事件、决策事件之间的关系及决策者。
+
+任务指南
+
+其中，协同场景定义-决策行为是决策事件分析的核心知识:
+
+(1)首先，结合协同场景定义-参与者来确定不同参与者视角下的决策事件及决策事件之间的关系。
+
+(2)其次，结合协同场景定义-行为-协同活动及协同场景定义-场景目标确定协同决策(即有多个参与者共同做出的决策)。
+
+(3)建立所有决策之间的关系。
+
+(4)在梳理决策事件时，需要用简短的业务术语描述决策事件。
+
+Checklist
+
+(1)所有决策事件是否已经梳理?
+
+(2)决策事件之间的关系是否合理?(上一节点决策输出为下一节点决策输入)
+
+(3)所有决策是否有对应参与者?
+
+- 示例：
+
+1.各参与者决策事件关系梳理
+
+(1)市场经理:订单初步选取-订单谈判一订单接取
+
+(2)生产经理:根据交货期分析订单一判断需求数量是否满足生产能力一选择订单
+
+(3)仓库经理:判断需求数量是否合理一是否需要调整仓库容量一产品缺货应急处理
+
+(4)财务经理:生产成本预测、采购成本预测一利润及毛利率计算一订单对现金流影响分析
+
+2.参与者决策事件之间的关系梳理
+
+(1)市场经理:订单初步选取一生产经理,根据交货期分析订单
+
+(2)市场经理:订单初步选取一财务经理,采购成本预测
+
+(3)市场经理:订单初步选取一财务经理,生产成本预测
+
+(4)生产经理:选择订单一财务经理,采购成本预测
+
+(5)生产经理:选择订单一财务经理,生产成本预测
+
+3.决策事件与协同决策事件之间的关系
+
+(1)生产经理:选择订单-协同决策,确定谈判方向
+
+(2)财务经理:订单对现金流影响分析-协同决策,确定谈判方向
+
+(3)协同决策:确定谈判方向一市场经理,订单谈判
+
+- 填写内容：
+
+## 2.2决策知识及数据梳理
+
+- 任务指南：
+
+决策知识用于描述可重用的业务规则或决策逻辑，可用文字进行描述或用函数进行形式化表示。
+
+任务指南
+
+从参与者的决策事件切入，分析每个参与者所执行的决策的决策逻辑，逐步分析所有参与者决策，最终分析协同决策。
+
+输入数据是决策过程中所需的具体数据，通常来自系统或用户输入。输入数据是决策逻辑的基础，直接影响决策结果。在虚拟仿真中，输入数据来源于系统可用的任何字段，例如:
+
+订单信息:订单编号、商品名称、合作客户、数量、单价、报价、声誉要求、期望工期、付款比例
+
+决策知识可以定义为一个函数F(X)，其中x为数据字段(如数量，如单价)，F为规则(如数量*单价)，F()为决策值(如F()=数量*单价，则F()为总价)。
+
+Checklist
+
+(1)数据来源是否可知(如在虚仿中为系统中某一字段信息)?如果不是，需要给出原因。
+
+(2)决策知识是否符合相关理论或常识?如果不是，请给出解释。
+
+(3)在进行知识描述时，是否用简洁的术语描述?
+
+- 填写内容：`,
+
+            'AI队友需求识别模板.docx': `AI队友需求识别模板
+
+请根据业务协同决策分析的结果，识别AI队友的具体需求。
+
+## 1. AI队友定位分析
+
+### 1.1 AI队友角色定义
+- AI队友在协同决策中扮演的角色：
+- AI队友需要支持的决策环节：
+- AI队友与人员的协作方式：
+
+### 1.2 AI队友能力需求
+- 需要的数据处理能力：
+- 需要的分析推理能力：
+- 需要的交互沟通能力：
+
+## 2. 功能需求分析
+
+### 2.1 核心功能需求
+- 主要功能模块：
+- 关键业务逻辑：
+- 数据输入输出要求：
+
+### 2.2 辅助功能需求
+- 用户界面需求：
+- 系统集成需求：
+- 性能效率需求：
+
+## 3. 技术实现要求
+
+### 3.1 技术架构要求
+- 推荐的技术栈：
+- 系统架构模式：
+- 数据存储方案：
+
+### 3.2 接口设计要求
+- API接口设计：
+- 数据交换格式：
+- 安全性要求：
+
+填写内容：`,
+
+            'AI队友详细设计模板.docx': `AI队友详细设计模板
+
+基于需求分析结果，进行AI队友的详细设计。
+
+## 1. 系统架构设计
+
+### 1.1 整体架构
+- 系统架构图：
+- 核心组件说明：
+- 技术选型说明：
+
+### 1
